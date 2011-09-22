@@ -5,39 +5,72 @@ require 'atom'
 
 describe Spandex::Page do
   include PageFactory
+  include TempFileHelper
 
-  content_path = TempFileHelper::TEMP_DIR
-  
-  it "can have a title" do
-    page = create_page("test", "test_content", :title => "hello!")
-    page.title.should == "hello!"
+  context "when parsing a file" do
+    it "determines the extension" do 
+      page = create_page("test.md", "test_content")
+      page.extension.should=="md"
+    end
+    
+    it "can have a title" do
+      page = create_page("test.md", "test_content", :title => "hello!")
+      page.title.should == "hello!"
+    end
+
+    it "can have a tag" do
+      page = create_page("test.md", "test_content", :tags => "lasers")
+      page.tags.should have(1).tags
+      page.tags[0].should == "lasers"
+    end
+    
+    it "can have multiple tags" do
+      page = create_page("test.md", "test_content", :tags => "lasers,goats")
+      page.tags.should == ['lasers', 'goats']
+    end
+
+    it "can have multiple tags with weird spacing" do
+      page = create_page("test.md", "test_content", :tags => " lasers  , goats ")
+      page.tags.should == ['lasers', 'goats']
+    end
+    
+    it "can also have tags called 'categories'" do
+      page = create_page("test.md", "test_content", :categories => "lasers,goats")
+      page.tags.should have(2).tags
+    end
+
+    it "can parse the body" do
+      page = create_page("test.md", "test_content")
+      page.body.should == "<p>test_content</p>\n"
+    end
+
+    it "can have a date" do
+      page = create_page("test.md", "test_content", :date => "2011/5/25")
+      page.date.should == Date.civil(2011, 5, 25)
+    end
+
+    it "produces good atom output" do
+      page = create_page("test.md", "test_content", :title => "hello!", :date => "2011/5/25")
+      entry = page.to_atom_entry("http://test.org")
+      entry.title.should == "hello!"
+    end
   end
 
-  it "can have a tag" do
-    page = create_page("test", "test_content", :tags => "lasers")
-    page.tags.should have(1).tags
-    page.tags[0].should == "lasers"
-  end
+  context "when supplying a path with no extension" do
 
-  it "can have multiple tags" do
-    page = create_page("test", "test_content", :tags => "lasers,goats")
-    page.tags.should have(2).tags
-  end
+    it "does something" do
+      create_file("test.md", "test_content")
+      page = Spandex::Page.from_path("test", :base_path => TEMP_DIR)
+      page.should_not be_nil
+    end
 
-  it "can parse the body" do
-    page = create_page("test", "test_content")
-    page.body.should == "<p>test_content</p>\n"
-  end
+    it "finds the first file tilt knows" do
+      create_file("test.snoogledoobers", "test_content")
+      create_file("test.md", "test_content")
+      page = Spandex::Page.from_path("test", :base_path => TEMP_DIR)
+      page.extension.should == "md"
+    end
 
-  it "can have a date" do
-    page = create_page("test", "test_content", :date => "2011/5/25")
-    page.date.should == Date.civil(2011, 5, 25)
-  end
-
-  it "produces good atom output" do
-    page = create_page("test", "test_content", :title => "hello!", :date => "2011/5/25")
-    entry = page.to_atom_entry("http://test.org")
-    entry.title.should == "hello!"
   end
 
   before(:each) do
