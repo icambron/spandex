@@ -49,6 +49,11 @@ describe Spandex::Page do
       page.date.should == Date.civil(2011, 5, 25)
     end
 
+    it "can omit the date" do
+      page = create_page("test.md", "test_content")
+      page.date.should be_nil
+    end
+
     it "produces good atom output" do
       page = create_page("test.md", "test_content", :title => "hello!", :date => "2011/5/25")
       entry = page.to_atom_entry("http://test.org")
@@ -60,14 +65,14 @@ describe Spandex::Page do
 
     it "does something" do
       create_file("test.md", "test_content")
-      page = Spandex::Page.from_path("test", :base_path => TEMP_DIR)
+      page = Spandex::Page.from_path("test", TEMP_DIR)
       page.should_not be_nil
     end
 
     it "finds the first file tilt knows" do
       create_file("test.snoogledoobers", "test_content")
       create_file("test.md", "test_content")
-      page = Spandex::Page.from_path("test", :base_path => TEMP_DIR)
+      page = Spandex::Page.from_path("test", TEMP_DIR)
       page.extension.should == "md"
     end
 

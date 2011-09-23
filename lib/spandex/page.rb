@@ -5,29 +5,30 @@ require 'atom'
 
 module Spandex
   class Page
-    attr_reader :filename, :mtime, :base_path, :extension
+    attr_reader :path, :mtime, :extension
 
-    def self.from_path(path, options)
-      glob = "#{path}.*"
-      glob = File.join(options[:base_path], glob) if options[:base_path]
-      paths = Pathname.glob(glob)
-      path_name = paths
-        .select{|path| Tilt.registered?(path.extname.sub(/^./, ''))}
-        .first
-      if path_name
-        metadata, content = parse_file("#{path}#{path_name.extname}", options)
-        Page.new(path, content, path_name.extname, metadata, options)
+    def self.from_path(path, base_path = "content")
+      paths = Pathname.glob(File.join(base_path, "#{path}.*"))
+      pathname = paths.select{|path| registered?(path)}.first
+      if pathname
+        metadata, content = parse_file(pathname)
+        Page.new(path, content, pathname.extname, metadata)
       else nil
       end
     end
 
-    def self.from_filename(filename, options)
-      path_name = Pathname.new(filename)
-      path = path_name.sub_ext('')
+    def self.from_filename(filename, base_path = "content")
+      pathname = Pathname.new(filename)
+      path = pathname.relative_path_from(pathify(base_path)).sub_ext('')
 
-      metadata, content = parse_file(filename, options)
+      metadata, content = parse_file(filename)
 
-      Page.new(path, content, path_name.extname, metadata, options)
+      Page.new(path, content, pathname.extname, metadata)
+    end
+
+    def self.registered?(pathname)
+      pathname = pathify(pathname)
+      Tilt.registered?(pathname.extname.sub(/^./, ''))
     end
     
     def title
@@ -62,7 +63,7 @@ module Spandex
     
     private
 
-    def initialize(path, content, extension = "md", metadata = {}, options = {})
+    def initialize(path, content, extension = "md", metadata = {})
       @path = path
       @content = content
       @metadata = metadata
@@ -74,16 +75,19 @@ module Spandex
       keys.each do |key|
         return @metadata[key] if @metadata.has_key? key
       end
+      nil
+    end
+
+    def self.pathify(path_or_string)
+      path_or_string.is_a?(String) ? Pathname.new(path_or_string) : path_or_string
     end
     
-    def self.parse_file(filename, options)
+    def self.parse_file(filename)
       def self.metadata?(text)
         text.split("\n").first =~ /^[\w ]+:/
       end
-      
-      base_path = options[:base_path] || "content"
 
-      contents = File.open(File.join(base_path, filename)).read
+      contents = File.open(filename).read
       
       first_paragraph, remaining = contents.split(/\r?\n\r?\n/, 2)
       metadata = {}

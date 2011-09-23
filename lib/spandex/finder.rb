@@ -1,5 +1,35 @@
+require 'pathname'
+
 module Spandex
   class Finder
-    
+
+    def initialize(base_dir = "content")
+      @base_dir = base_dir
+    end
+
+    def all_pages
+      unless @pages
+        @pages = []
+        roots = []
+        Dir.glob(File.join(@base_dir, "**/*"))
+        .map{|path| Pathname.new(path)}
+        .select{|path| Page.registered?(path)}
+        .each do |path|
+          no_extension = path.sub_ext('')
+          unless roots.include?(no_extension)
+            roots << no_extension
+            @pages << Page.from_filename(path, @base_dir) 
+          end
+        end
+      end
+      @pages
+    end
+
+    def all_articles
+      all_pages
+        .select{|page| page.date}
+        .sort { |x, y| y.date <=> x.date }
+    end
+
   end
 end

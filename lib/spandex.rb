@@ -1,2 +1,2 @@
-require 'spandex/page.rb'
-require 'spandex/finder.rb'
+require 'spandex/page'
+require 'spandex/finder'

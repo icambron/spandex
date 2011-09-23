@@ -4,19 +4,20 @@ module PageFactory
   include TempFileHelper
 
   def create_file(name, content, metadata = {})
-    path = File.join(TEMP_DIR, name)
+    full_name = File.join(TEMP_DIR, name)
     metatext = metadata.map { |key, value| "#{key}: #{value}" }.join("\n")
     contents =<<-EOF
 #{metatext}
 
 #{content}
 EOF
-    File.open(path, 'w') { |file| file.write(contents) }
+    File.open(full_name, 'w') { |file| file.write(contents) }
+    full_name
   end
 
   def create_page(name, content, metadata = {})
-    create_file(name, content, metadata)
-    Spandex::Page.from_filename(name, :base_path => TEMP_DIR)
+    full_name = create_file(name, content, metadata)
+    Spandex::Page.from_filename(full_name, TEMP_DIR)
   end
 
 end
