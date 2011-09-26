@@ -46,7 +46,6 @@ describe Spandex::Finder do
       [Date.civil(2011,5,25), Date.civil(1986,5,25), Date.civil(1982,5,25)].each_with_index do |date, i|
         results[i].date.should == date
       end
-      
     end
     
   end
@@ -112,7 +111,6 @@ describe Spandex::Finder do
     end
   end
 
-
   context "loading a specific page" do
 
     it "does in fact load it" do
@@ -155,6 +153,29 @@ describe Spandex::Finder do
     it "doesn't have to exist" do
       page = make_finder.get_by_filename(File.join(TEMP_DIR, "this_is_not_a_file.md"))
       page.should be_nil
+    end
+
+  end
+
+  context "when finding articles" do
+    it "can find them by tag" do
+      create_file("no.md", "You don't have to say you're sorry", :tags => "nono", :date => "2011/5/25")
+      create_file("yeah.md", "You never mean it when you say you're sorry", :tags => "yeahyeah", :date => "2011/5/26", :title => "Yeah Yeah Yeah")
+      
+      
+      results = make_finder.find_articles(:tag => "yeahyeah")
+      results.size.should == 1
+      results.first.title == "Yeah Yeah Yeah"
+    end
+
+    it "only finds articles" do
+      create_file("no.md", "You don't have to say you're sorry", :tags => "yeahyeah")
+      create_file("yeah.md", "You never mean it when you say you're sorry", :tags => "yeahyeah", :date => "2011/5/26", :title => "Yeah Yeah Yeah")
+      
+      
+      results = make_finder.find_articles(:tag => "yeahyeah")
+      results.size.should == 1
+      results.first.title == "Yeah Yeah Yeah"
     end
 
   end

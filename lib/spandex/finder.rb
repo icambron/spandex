@@ -36,6 +36,10 @@ module Spandex
         .sort {|x, y| y.date <=> x.date }
     end
 
+    def find_articles(conditions)
+      find_inside(all_articles, conditions)
+    end
+
     def tags
       @tags ||= all_pages.map{|p| p.tags}.flatten.uniq
     end
@@ -66,6 +70,19 @@ module Spandex
         @pages[key] = page
         page
       end
+    end
+
+    def find_inside(xs, conditions = {}) 
+      output = xs
+      conditions.each do |k, v|
+        next unless v
+        cond = case k
+               when :tag then lambda {|p| p.tags.include?(v) }
+               else lambda{|p| true}
+               end
+        output = output.select(&cond)
+      end
+      output
     end
     
   end
