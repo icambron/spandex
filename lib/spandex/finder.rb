@@ -1,4 +1,5 @@
 require 'pathname'
+require 'atom'
 
 module Spandex
   class Finder
@@ -31,5 +32,23 @@ module Spandex
         .sort { |x, y| y.date <=> x.date }
     end
 
+    def tags
+      @tags ||= all_pages.map{|p| p.tags}.flatten.uniq
+    end
+
+    def atom_feed(count, author, root, path_to_xml)
+      articles = all_articles.take(count)
+      Atom::Feed.new do |f|
+        f.id = root
+        f.links << Atom::Link.new(:href => "http://#{root}#{path_to_xml}", :rel => "self")
+        f.links << Atom::Link.new(:href => "http://#{root}", :rel => "alternate")
+        f.authors << Atom::Person.new(:name => author)
+        f.updated = articles[0].date if articles[0]
+        articles.each do |post|
+          f.entries << post.to_atom_entry(root)
+        end  
+      end.to_xml
+    end
+    
   end
 end

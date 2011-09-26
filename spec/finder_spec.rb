@@ -48,7 +48,7 @@ describe Spandex::Finder do
 
     it "sorts by date descending" do
       create_page("stuff.md", "I like that you can't slow down.", :date => "1986/5/25")
-      create_page("more_stuff.md", "Step back! 'Cause you ain't no one.", :date => "1982/5/25")
+      create_page("more_stuff.md", "Step back! 'Cause you ain't no one.", :date => "1982/5/25") 
       create_page("even_more_stuff.md", "You're living in a lie.", :date => "2011/5/25")
 
       results = Spandex::Finder.new(TEMP_DIR).all_articles
@@ -63,7 +63,64 @@ describe Spandex::Finder do
   end
 
   context "when generating an atom feed" do
+    
+    it "generates real atom content" do
+      create_page("stuff.md", "You ain't nothing but a BFI", :date => "1986/5/25", :title => "BFI")
+      create_page("more_stuff.md", "Leaving town on a two wheeler while your kids are home", :date => "1982/5/25")
 
+      #generate and then reparse
+      feed = Spandex::Finder.new(TEMP_DIR).atom_feed(3, "The Sounds", "sounds.test.org", "articles.xml")
+      ratom = Atom::Feed.load_feed(feed)
+
+      ratom.entries.size.should == 2
+      ratom.authors.first.name.should == "The Sounds"
+      ratom.links.size.should == 2
+
+      e = ratom.entries.first
+      e.title.should == "BFI"
+    
+    end 
+
+    it "should only show the top n articles" do
+      create_page("stuff.md", "Giving up your love and life for some silver chrome", :date => "1986/5/25")
+      create_page("more_stuff.md", "You're acting like a fool so take my advice.", :date => "1986/5/25")
+      create_page("even_more_stuff.md", "It's not so hard to keep your eyes on the price.", :date => "1986/5/25")
+
+      feed = Spandex::Finder.new(TEMP_DIR).atom_feed(2, "The Sounds", "sounds.test.org", "articles.xml")
+      ratom = Atom::Feed.load_feed(feed)
+
+      ratom.entries.size.should == 2
+    end
+
+    it "only includes pages with dates" do
+      create_page("stuff.md", "You don't float like butterfly or fight like Ali.", :date => "2011/5/25")
+      create_page("more_stuff.md", "Dress like Prince but to the lowest degree.")
+
+      feed = Spandex::Finder.new(TEMP_DIR).atom_feed(2, "The Sounds", "sounds.test.org", "articles.xml")
+      ratom = Atom::Feed.load_feed(feed)
+
+      ratom.entries.size.should == 1
+    end
+    
+  end
+
+  context "when listing tags" do
+    
+    it "can list tags" do
+      create_page("stuff.md", "I like that you can't slow down.", :tags => "Sweedish, New Wave")
+      create_page("more_stuff.md", "Step back! 'Cause you ain't no one.", :tags => "Indie Rock") 
+      
+      tags = Spandex::Finder.new(TEMP_DIR).tags
+      tags.should == ["Sweedish", "New Wave", "Indie Rock"]
+    end
+
+    it "has unique tags" do
+      create_page("stuff.md", "I like that you can't slow down.", :tags => "Sweedish, Indie Rock")
+      create_page("more_stuff.md", "Step back! 'Cause you ain't no one.", :tags => "Indie Rock") 
+      
+      tags = Spandex::Finder.new(TEMP_DIR).tags
+      tags.should == ["Sweedish", "Indie Rock"]
+    end
   end
 
   before(:each) do
