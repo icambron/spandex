@@ -1,4 +1,3 @@
-require File.expand_path('page_factory', File.dirname(__FILE__))
 require File.expand_path('spec_helper', File.dirname(__FILE__))
 require 'spandex'
 require 'atom'
@@ -141,11 +140,16 @@ describe Spandex::Finder do
       finder.get("stuff").tags.should == ["yeah"]
     end
 
+    it "ignores trailing slashes" do
+      create_file("stuff.md", "Well, you're not so bright")
+      make_finder.get("stuff/").should_not be_nil
+    end
+
   end
 
   context "when loading by filename" do
     it "does in fact load something" do
-      create_file("stuff.md", "Well, you're not so bright")
+      create_file("stuff.md", "You don't have to say you're sorry")
       page = make_finder.get_by_filename(File.join(TEMP_DIR, "stuff.md"))
       page.should_not be_nil
     end
@@ -159,8 +163,8 @@ describe Spandex::Finder do
 
   context "when finding articles" do
     it "can find them by tag" do
-      create_file("no.md", "You don't have to say you're sorry", :tags => "nono", :date => "2011/5/25")
-      create_file("yeah.md", "You never mean it when you say you're sorry", :tags => "yeahyeah", :date => "2011/5/26", :title => "Yeah Yeah Yeah")
+      create_file("no.md", "You never mean it when you say you're sorry", :tags => "nono", :date => "2011/5/25")
+      create_file("yeah.md", "No guts, no glory, no time to worry", :tags => "yeahyeah", :date => "2011/5/26", :title => "Yeah Yeah Yeah")
       
       
       results = make_finder.find_articles(:tag => "yeahyeah")
@@ -169,8 +173,8 @@ describe Spandex::Finder do
     end
 
     it "only finds articles" do
-      create_file("no.md", "You don't have to say you're sorry", :tags => "yeahyeah")
-      create_file("yeah.md", "You never mean it when you say you're sorry", :tags => "yeahyeah", :date => "2011/5/26", :title => "Yeah Yeah Yeah")
+      create_file("no.md", "No happy ending to your story", :tags => "yeahyeah")
+      create_file("yeah.md", "In moments like this, don't give a fuck about you", :tags => "yeahyeah", :date => "2011/5/26", :title => "Yeah Yeah Yeah")
       
       
       results = make_finder.find_articles(:tag => "yeahyeah")

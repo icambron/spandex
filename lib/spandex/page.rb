@@ -8,6 +8,7 @@ module Spandex
     attr_reader :path, :mtime, :extension, :render_options
 
     def self.from_path(path, base_path, render_options = {})
+      path = fix_path path
       filename = file_from_path(path, base_path)
       if filename
         metadata, content = parse_file(filename)
@@ -35,6 +36,7 @@ module Spandex
     end
 
     def self.file_from_path(path, base_path)
+      path = fix_path path
       paths = Pathname.glob(File.join(base_path, "#{path}.*"))
       pathname = paths.select{|path| registered?(path)}.first
     end
@@ -119,6 +121,10 @@ module Spandex
       end
       markup = metadata?(first_paragraph) ? remaining : contents
       return metadata, markup
+    end
+
+    def self.fix_path(path)
+      path.sub(/\/$/, '')
     end
 
   end
