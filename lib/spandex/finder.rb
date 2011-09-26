@@ -10,8 +10,9 @@ module Spandex
       end
     end
 
-    def initialize(base_dir)
+    def initialize(base_dir, render_options = {})
       @base_dir = base_dir
+      @render_options = render_options
     end
 
     def get(path)
@@ -66,7 +67,7 @@ module Spandex
         @pages[key]
       else
         @pages ||= CaseInsensitiveHash.new
-        page = Page.from_filename(filename, @base_dir)
+        page = Page.from_filename(filename, @base_dir, @render_options)
         @pages[key] = page
         page
       end
