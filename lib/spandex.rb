@@ -4,8 +4,8 @@ require 'spandex/finder'
 module Spandex
   class << self
 
-    def new(base_path)
-      Spandex::Finder.new(base_path)
+    def new(base_path, render_options = {})
+      Spandex::Finder.new(base_path, render_options)
     end
 
     def method_missing(method, *args, &block)
