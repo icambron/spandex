@@ -5,25 +5,25 @@ require 'atom'
 
 module Spandex
   class Page
-    attr_reader :path, :mtime, :extension
+    attr_reader :path, :mtime, :extension, :render_options
 
-    def self.from_path(path, base_path)
+    def self.from_path(path, base_path, render_options = {})
       filename = file_from_path(path, base_path)
       if filename
         metadata, content = parse_file(filename)
-        Page.new(path, content, filename.extname, metadata)
+        Page.new(path, content, filename.extname, metadata, render_options)
       else nil
       end
     end
 
-    def self.from_filename(filename, base_path)
+    def self.from_filename(filename, base_path, render_options = {})
       pathname = Pathname.new(filename)
       return nil unless pathname.exist?
 
       path = path_from_file(pathname, base_path)
       metadata, content = parse_file(filename)
 
-      Page.new(path, content, pathname.extname, metadata)
+      Page.new(path, content, pathname.extname, metadata, render_options)
     end
 
     def self.mtime(path, base_path)
@@ -59,7 +59,7 @@ module Spandex
     end
     
     def body
-      @rendered_body ||= Tilt[@extension].new{@content}.render
+      @rendered_body ||= Tilt[@extension].new(nil, 1, @render_options){@content}.render
     end
     
     def tags
@@ -82,12 +82,13 @@ module Spandex
     
     private
 
-    def initialize(path, content, extension = "md", metadata = {})
+    def initialize(path, content, extension, metadata, render_options = {})
       @path = path
       @content = content
       @metadata = metadata
       @extension = extension.sub(/^./, '')
       @mtime = Time.now
+      @render_options = render_options
     end
   
     def metadata(*keys)
