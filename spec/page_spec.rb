@@ -59,6 +59,12 @@ describe Spandex::Page do
       entry = page.to_atom_entry("http://test.org")
       entry.title.should == "hello!"
     end
+
+    it "doesn't have to exist" do
+      page = Spandex::Page.from_filename(File.join(TEMP_DIR, "this_is_not_a_file.md"), TEMP_DIR)
+      page.should be_nil
+    end
+
   end
 
   context "when supplying a path with no extension" do
@@ -74,6 +80,11 @@ describe Spandex::Page do
       create_file("test.md", "test_content")
       page = Spandex::Page.from_path("test", TEMP_DIR)
       page.extension.should == "md"
+    end
+
+    it "doesn't have to exist" do
+      page = Spandex::Page.from_path("this/is/not/a/real/file", TEMP_DIR)
+      page.should be_nil
     end
 
   end

@@ -1,5 +1,5 @@
 module TempFileHelper
-  TEMP_DIR = File.expand_path('tmp', File.dirname(__FILE__))
+  TEMP_DIR = File.expand_path('content', File.dirname(__FILE__))
 
   def create_temp_directory
     FileUtils.mkdir_p(TempFileHelper::TEMP_DIR)

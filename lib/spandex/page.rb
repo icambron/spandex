@@ -7,7 +7,7 @@ module Spandex
   class Page
     attr_reader :path, :mtime, :extension
 
-    def self.from_path(path, base_path = "content")
+    def self.from_path(path, base_path)
       paths = Pathname.glob(File.join(base_path, "#{path}.*"))
       pathname = paths.select{|path| registered?(path)}.first
       if pathname
@@ -17,10 +17,11 @@ module Spandex
       end
     end
 
-    def self.from_filename(filename, base_path = "content")
+    def self.from_filename(filename, base_path)
       pathname = Pathname.new(filename)
-      path = pathname.relative_path_from(pathify(base_path)).sub_ext('')
+      return nil unless pathname.exist?
 
+      path = pathname.relative_path_from(pathify(base_path)).sub_ext('')
       metadata, content = parse_file(filename)
 
       Page.new(path, content, pathname.extname, metadata)
@@ -30,6 +31,7 @@ module Spandex
       pathname = pathify(pathname)
       Tilt.registered?(pathname.extname.sub(/^./, ''))
     end
+
     
     def title
       metadata("title") || "(Unknown Title)"

@@ -4,8 +4,16 @@ require 'atom'
 module Spandex
   class Finder
 
-    def initialize(base_dir = "content")
+    def initialize(base_dir)
       @base_dir = base_dir
+    end
+
+    def get(path)
+      Page.from_path(path, @base_dir)
+    end
+
+    def get_by_filename(filename)
+      Page.from_filename(filename, @base_dir)
     end
 
     def all_pages
