@@ -13,7 +13,3 @@ module TempFileHelper
     File.join(TempFileHelper::TEMP_DIR, base)
   end
 end
-
-RSpec.configure do |config|
-  config.include(TempFileHelper)
-end

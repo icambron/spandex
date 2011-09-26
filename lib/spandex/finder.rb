@@ -4,40 +4,36 @@ require 'atom'
 module Spandex
   class Finder
 
+    class CaseInsensitiveHash < Hash
+      def [](key)
+        super(key.to_s.downcase)
+      end
+    end
+
     def initialize(base_dir)
       @base_dir = base_dir
     end
 
     def get(path)
-      Page.from_path(path, @base_dir)
+      load(Page.file_from_path(path, @base_dir), path)
     end
 
     def get_by_filename(filename)
-      Page.from_filename(filename, @base_dir)
+      load(filename)
     end
 
     def all_pages
-      unless @pages
-        @pages = []
-        roots = []
-        Dir.glob(File.join(@base_dir, "**/*"))
+      roots = []
+      Dir.glob(File.join(@base_dir, "**/*"))
         .map{|path| Pathname.new(path)}
-        .select{|path| Page.registered?(path)}
-        .each do |path|
-          no_extension = path.sub_ext('')
-          unless roots.include?(no_extension)
-            roots << no_extension
-            @pages << Page.from_filename(path, @base_dir) 
-          end
-        end
-      end
-      @pages
+        .each{|path| load(path)}
+      @pages.values
     end
 
     def all_articles
       all_pages
         .select{|page| page.date}
-        .sort { |x, y| y.date <=> x.date }
+        .sort {|x, y| y.date <=> x.date }
     end
 
     def tags
@@ -56,6 +52,20 @@ module Spandex
           f.entries << post.to_atom_entry(root)
         end  
       end.to_xml
+    end
+
+    private
+
+    def load(filename, key = Page.path_from_file(filename, @base_dir))
+      return nil unless filename && key && File.exists?(filename)
+      if @pages && @pages[key] && File.mtime(filename) < @pages[key].mtime
+        @pages[key]
+      else
+        @pages ||= CaseInsensitiveHash.new
+        page = Page.from_filename(filename, @base_dir)
+        @pages[key] = page
+        page
+      end
     end
     
   end

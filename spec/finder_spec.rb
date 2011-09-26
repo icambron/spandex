@@ -21,16 +21,7 @@ describe Spandex::Finder do
       
       make_finder.all_pages.size.should == 1
     end
-    
-    it "caches the pages" do
-      finder = make_finder
-      create_file("stuff.md", "It only takes you a minute to show.")
-      finder.all_pages
-      
-      create_file("more_stuff.md", "But you ain't got nothing but an empty soul.")
-      finder.all_pages.size.should == 1
-      
-    end
+  
   end
 
   context "when getting all articles" do
@@ -142,11 +133,21 @@ describe Spandex::Finder do
       page.should be_nil
     end
 
+    it "caches individual files" do
+      finder = make_finder
+
+      create_file("stuff.md", "And did it matter to you", :tags => "yeah")
+      finder.get("stuff").tags.should == ["yeah"]
+
+      create_file("stuff.md", "Now you lost it all", :tags => "nah")
+      finder.get("stuff").tags.should == ["yeah"]
+    end
+
   end
 
   context "when loading by filename" do
     it "does in fact load something" do
-      create_file("stuff.md", "And did it matter to you")
+      create_file("stuff.md", "Well, you're not so bright")
       page = make_finder.get_by_filename(File.join(TEMP_DIR, "stuff.md"))
       page.should_not be_nil
     end

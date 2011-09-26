@@ -8,11 +8,10 @@ module Spandex
     attr_reader :path, :mtime, :extension
 
     def self.from_path(path, base_path)
-      paths = Pathname.glob(File.join(base_path, "#{path}.*"))
-      pathname = paths.select{|path| registered?(path)}.first
-      if pathname
-        metadata, content = parse_file(pathname)
-        Page.new(path, content, pathname.extname, metadata)
+      filename = file_from_path(path, base_path)
+      if filename
+        metadata, content = parse_file(filename)
+        Page.new(path, content, filename.extname, metadata)
       else nil
       end
     end
@@ -21,10 +20,28 @@ module Spandex
       pathname = Pathname.new(filename)
       return nil unless pathname.exist?
 
-      path = pathname.relative_path_from(pathify(base_path)).sub_ext('')
+      path = path_from_file(pathname, base_path)
       metadata, content = parse_file(filename)
 
       Page.new(path, content, pathname.extname, metadata)
+    end
+
+    def self.mtime(path, base_path)
+      file = file_from_path(path, base_path)
+      if File.exists?(path)
+        File.mtime(file) 
+      else nil
+      end
+    end
+
+    def self.file_from_path(path, base_path)
+      paths = Pathname.glob(File.join(base_path, "#{path}.*"))
+      pathname = paths.select{|path| registered?(path)}.first
+    end
+
+    def self.path_from_file(pathname, base_path)
+      pathname = pathify(pathname)
+      pathname.relative_path_from(pathify(base_path)).sub_ext('')
     end
 
     def self.registered?(pathname)
@@ -102,5 +119,6 @@ module Spandex
       markup = metadata?(first_paragraph) ? remaining : contents
       return metadata, markup
     end
+
   end
 end
