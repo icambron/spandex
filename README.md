@@ -25,7 +25,7 @@ Write some *awesome* markdown here.
 Then use Spandex to do the work:
 
 ```ruby
-  @spandex = Spandex::Finder.new(File.expand_path('content', File.dirname(__FILE__))
+  @spandex = Spandex.new(File.expand_path('content', File.dirname(__FILE__))
 
   @spandex.get('testing').render #=> get the HTML for that post
 
@@ -34,7 +34,7 @@ Then use Spandex to do the work:
   @spandex.all_articles #=> all pages with a date (e.g. all blog posts)
 ```
 
-The content is just Tilt
-------------------------
+The content runs through Tilt
+-----------------------------
 
-The markup is processed using [Tilt](https://github.com/rtomayko/tilt). That means it can read a lot of different markup formats, and comes with an easy mechanism for adding extra functionality. Just register a new extension or template with Tilt, and it will work seamlessly in spandex.
+The markup is processed using [Tilt](https://github.com/rtomayko/tilt). That means it can read a lot of different markup formats, and comes with an easy mechanism for adding extra functionality. Just register a new extension or template with Tilt, and it will work seamlessly in Spandex.
