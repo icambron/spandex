@@ -19,7 +19,6 @@ Title: My first post
 Date: 2011/9/25
 Tags: awesome, lasers
 
-
 Write some *awesome* markdown here.
 ```
 
