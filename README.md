@@ -25,13 +25,13 @@ Write some *awesome* markdown here.
 Then use Spandex to do the work:
 
 ```ruby
-  @spandex = Spandex.new(File.expand_path('content', File.dirname(__FILE__))
+  spandex = Spandex.new(File.expand_path('content', File.dirname(__FILE__))
 
-  @spandex.get('testing').render #=> get the HTML for that post
+  spandex.get('testing').render #=> get the HTML for that post
 
-  @spandex.all_pages #=> all pages under content
+  spandex.all_pages #=> all pages under content
 
-  @spandex.all_articles #=> all pages with a date (e.g. all blog posts)
+  spandex.all_articles #=> all pages with a date (e.g. all blog posts)
 ```
 
 The content runs through Tilt
