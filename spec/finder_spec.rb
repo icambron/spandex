@@ -20,10 +20,21 @@ describe Spandex::Finder do
       
       make_finder.all_pages.size.should == 1
     end
+
+    it "finds thing with populated attributes" do
+      create_file("stuff.md", "Some say you're a loner but I know your kind.", :title => "The")
+      create_file("more_stuff.textile", "It's sad to see that's why I fake that I'm blind.", :title => "Sounds")
+
+      make_finder.all_pages.map{|p| p.title}.should == ["The", "Sounds"]
+    end
   
   end
 
   context "when getting all articles" do
+
+    it "works fine when there are no articles" do
+      make_finder.all_articles.should be_empty
+    end
     
     it "only finds pages with dates" do
       create_file("stuff.md", "You don't float like butterfly or fight like Ali.", :date => "2011/5/25")
@@ -45,6 +56,11 @@ describe Spandex::Finder do
       [Date.civil(2011,5,25), Date.civil(1986,5,25), Date.civil(1982,5,25)].each_with_index do |date, i|
         results[i].date.should == date
       end
+    end
+
+    it "ignores stray files" do
+      create_file("stuff.md~", "I like that you can't slow down.", :date => "1986/5/25")
+      make_finder.all_articles.should be_empty
     end
     
   end
