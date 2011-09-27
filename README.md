@@ -53,6 +53,7 @@ page = spandex.get('subfolder/deeper/things')
 ```
 
 You can pass options through to Tilt at initialization:
+
 ```ruby
 spandex = Spandex.new(path, :fenced_code_blocks => true) #special option for Redcarpet
 ```
