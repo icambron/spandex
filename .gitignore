@@ -10,3 +10,4 @@ tmp/**/*
 bin/**
 .sass-cache/**
 Gemfile.lock
+pkg
