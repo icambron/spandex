@@ -39,6 +39,10 @@ module Spandex
         .sort {|x, y| y.date <=> x.date }
     end
 
+    def find_pages(conditions)
+      find_inside(all_pages, conditions)
+    end
+
     def find_articles(conditions)
       find_inside(all_articles, conditions)
     end
@@ -81,6 +85,7 @@ module Spandex
         next unless v
         cond = case k
                when :tag then lambda {|p| p.tags.include?(v) }
+               when :title then lambda {|p| p.title.match(v)}
                else lambda{|p| true}
                end
         output = output.select(&cond)
