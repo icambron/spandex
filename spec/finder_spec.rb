@@ -154,16 +154,6 @@ describe Spandex::Finder do
       page.should be_nil
     end
 
-    it "caches individual files" do
-      finder = make_finder
-
-      create_file("stuff.md", :tags => "yeah")
-      finder.get("stuff").tags.should == ["yeah"]
-
-      create_file("stuff.md", :tags => "nah")
-      finder.get("stuff").tags.should == ["yeah"]
-    end
-
     it "doesn't muck up the cache" do
       create_file("stuff.md")
       finder = make_finder

@@ -17,7 +17,9 @@ module Spandex
 
     def get(path)
       path = Page.pathify path
-      load(Page.file_from_path(path, @base_dir), path)
+      paths = Pathname.glob(File.join(@base_dir, "#{path}.*"))
+      file = paths.select{|path| Page.registered?(path)}.first
+      load(file, path)
     end
 
     def get_by_filename(filename)
@@ -94,7 +96,6 @@ module Spandex
         output = output.select(&cond)
       end
       output
-    end
-    
+    end    
   end
 end

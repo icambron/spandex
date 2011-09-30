@@ -17,12 +17,6 @@ module Spandex
       Page.new(path, content, pathname.extname, metadata, render_options)
     end
 
-    def self.file_from_path(path, base_path)
-      path = fix_path path
-      paths = Pathname.glob(File.join(base_path, "#{path}.*"))
-      pathname = paths.select{|path| registered?(path)}.first
-    end
-
     def self.path_from_file(pathname, base_path)
       pathname = pathify pathname
       pathify pathname.relative_path_from(pathify(base_path)).sub_ext('')
