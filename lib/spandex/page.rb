@@ -24,8 +24,8 @@ module Spandex
     end
 
     def self.path_from_file(pathname, base_path)
-      pathname = pathify(pathname)
-      pathname.relative_path_from(pathify(base_path)).sub_ext('')
+      pathname = pathify pathname
+      pathify pathname.relative_path_from(pathify(base_path)).sub_ext('')
     end
 
     def self.registered?(pathname)
@@ -83,7 +83,7 @@ module Spandex
     end
 
     def self.pathify(path_or_string)
-      path_or_string.is_a?(String) ? Pathname.new(fix_path path_or_string) : path_or_string
+      fix_path path_or_string.is_a?(String) ? Pathname.new(path_or_string) : path_or_string
     end
     
     def self.parse_file(filename)
@@ -106,6 +106,7 @@ module Spandex
     end
 
     def self.fix_path(path)
+      path = "/#{path}" unless path.to_s.match(/^\//)
       path.sub(/\/$/, '')
     end
 

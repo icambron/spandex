@@ -28,7 +28,7 @@ module Spandex
       roots = []
       @pages ||= CaseInsensitiveHash.new
       Dir.glob(File.join(@base_dir, "**/*"))
-        .map{|path| Pathname.new(path)}
+        .map{|path| Page.pathify(path)}
         .select{|path| Page.registered?(path)}
         .each{|path| load(path)}
       @pages.values

@@ -134,6 +134,13 @@ describe Spandex::Finder do
       page.should_not be_nil
     end
 
+    it "can have a leading /" do
+      create_file("stuff.md")
+      page = make_finder.get("/stuff")
+      page.should_not be_nil
+    end
+
+
     it "finds the first file tilt knows" do
       create_file("stuff.snoogledoobers")
       create_file("stuff.md")
@@ -174,9 +181,17 @@ describe Spandex::Finder do
       finder = make_finder
       finder.all_pages
       finder.get("stuff/")
-
       finder.all_pages.size.should == 1
     end
+
+    it "doesn't create a separate cache entry for leading slashes" do
+      create_file("stuff.md")
+      finder = make_finder
+      finder.get("stuff")
+      finder.get("/stuff")
+      finder.all_pages.size.should == 1
+    end
+    
 
   end
 
