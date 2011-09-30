@@ -11,3 +11,4 @@ bin/**
 .sass-cache/**
 Gemfile.lock
 pkg
+*.gem

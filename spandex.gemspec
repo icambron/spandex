@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Isaac Cambron"]
   s.email       = ["icambron@alum.mit.edu"]
-  s.homepage    = ""
+  s.homepage    = "https://github.com/icambron/spandex"
   s.summary     = "A simple content engine"
   s.description = "Spandex manages a store of markup files and their metadata, useful in building blogs or blog engines"
 
