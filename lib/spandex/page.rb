@@ -7,16 +7,6 @@ module Spandex
   class Page
     attr_reader :path, :mtime, :extension, :render_options
 
-    def self.from_path(path, base_path, render_options = {})
-      path = fix_path path
-      filename = file_from_path(path, base_path)
-      if filename
-        metadata, content = parse_file(filename)
-        Page.new(path, content, filename.extname, metadata, render_options)
-      else nil
-      end
-    end
-
     def self.from_filename(filename, base_path, render_options = {})
       pathname = Pathname.new(filename)
       return nil unless pathname.exist?
@@ -25,14 +15,6 @@ module Spandex
       metadata, content = parse_file(filename)
 
       Page.new(path, content, pathname.extname, metadata, render_options)
-    end
-
-    def self.mtime(path, base_path)
-      file = file_from_path(path, base_path)
-      if File.exists?(path)
-        File.mtime(file) 
-      else nil
-      end
     end
 
     def self.file_from_path(path, base_path)
@@ -101,7 +83,7 @@ module Spandex
     end
 
     def self.pathify(path_or_string)
-      path_or_string.is_a?(String) ? Pathname.new(path_or_string) : path_or_string
+      path_or_string.is_a?(String) ? Pathname.new(fix_path path_or_string) : path_or_string
     end
     
     def self.parse_file(filename)

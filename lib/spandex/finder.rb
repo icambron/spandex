@@ -16,6 +16,7 @@ module Spandex
     end
 
     def get(path)
+      path = Page.pathify path
       load(Page.file_from_path(path, @base_dir), path)
     end
 
@@ -68,6 +69,7 @@ module Spandex
     private
 
     def load(filename, key = Page.path_from_file(filename, @base_dir))
+      key = key.to_s
       return nil unless filename && key && File.exists?(filename)
       if @pages && @pages[key] && File.mtime(filename) < @pages[key].mtime
         @pages[key]

@@ -156,9 +156,26 @@ describe Spandex::Finder do
       finder.get("stuff").tags.should == ["yeah"]
     end
 
+    it "doesn't muck up the cache" do
+      create_file("stuff.md")
+      finder = make_finder
+      finder.all_pages
+      finder.get("stuff")
+      finder.all_pages.size.should == 1
+    end
+
     it "ignores trailing slashes" do
       create_file("stuff.md")
       make_finder.get("stuff/").should_not be_nil
+    end
+
+    it "doesn't create a separate cache entry for trailing slashes" do
+      create_file("stuff.md")
+      finder = make_finder
+      finder.all_pages
+      finder.get("stuff/")
+
+      finder.all_pages.size.should == 1
     end
 
   end
@@ -176,7 +193,6 @@ describe Spandex::Finder do
     end
 
   end
-
 
   context "when find pages" do
     it "can find them by tag" do
