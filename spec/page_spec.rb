@@ -63,6 +63,16 @@ describe Spandex::Page do
       page.date.should be_nil
     end
 
+    it "exposes metadata directly" do
+      page = create_page("test.md", :somethin => "yo")
+      page.metadata("somethin").should == "yo"
+    end
+
+    it "allows you to use symbols in getting metadata" do
+      page = create_page("test.md", :somethin => "yo")
+      page.metadata(:somethin).should == "yo"
+    end
+
     it "produces good atom output" do
       page = create_page("test.md", :title => "hello!", :date => "2011/5/25")
       entry = page.to_atom_entry("http://test.org")

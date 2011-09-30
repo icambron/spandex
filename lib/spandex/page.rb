@@ -33,13 +33,20 @@ module Spandex
       Tilt.registered?(pathname.extname.sub(/^./, ''))
     end
 
+    def metadata(*keys)
+      keys.each do |key|
+        key = key.to_s
+        return @metadata[key] if @metadata.has_key? key
+      end
+      nil
+    end
     
     def title
-      metadata("title") || "(Unknown Title)"
+      metadata(:title) || "(Unknown Title)"
     end
     
     def date
-      @date ||= metadata("date") ? DateTime.parse(metadata("date")) : nil
+      @date ||= metadata(:date) ? DateTime.parse(metadata(:date)) : nil
     end
     
     def body
@@ -47,7 +54,7 @@ module Spandex
     end
     
     def tags
-      @tags ||= metadata("tags", "categories") ? metadata("tags", "categories").split(",").map{|tag| tag.strip} : []
+      @tags ||= metadata(:tags, :categories) ? metadata(:tags, :categories).split(",").map{|tag| tag.strip} : []
     end
     
     def to_atom_entry(root)
@@ -73,13 +80,6 @@ module Spandex
       @extension = extension.sub(/^./, '')
       @mtime = Time.now
       @render_options = render_options
-    end
-  
-    def metadata(*keys)
-      keys.each do |key|
-        return @metadata[key] if @metadata.has_key? key
-      end
-      nil
     end
 
     def self.pathify(path_or_string)
