@@ -28,7 +28,7 @@ module Spandex
       roots = []
       @pages ||= CaseInsensitiveHash.new
       Dir.glob(File.join(@base_dir, "**/*"))
-        .map{|path| Page.pathify(path)}
+        .map{|path| Pathname.new(path)}
         .select{|path| Page.registered?(path)}
         .each{|path| load(path)}
       @pages.values
@@ -52,10 +52,11 @@ module Spandex
       @tags ||= all_pages.map{|p| p.tags}.flatten.uniq
     end
 
-    def atom_feed(count, author, root, path_to_xml)
+    def atom_feed(count, title, author, root, path_to_xml)
       articles = all_articles.take(count)
       Atom::Feed.new do |f|
         f.id = root
+        f.title = title
         f.links << Atom::Link.new(:href => "http://#{root}#{path_to_xml}", :rel => "self")
         f.links << Atom::Link.new(:href => "http://#{root}", :rel => "alternate")
         f.authors << Atom::Person.new(:name => author)

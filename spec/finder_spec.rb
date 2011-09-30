@@ -72,9 +72,10 @@ describe Spandex::Finder do
       create_file("more_stuff.md", :date => "1982/5/25")
 
       #generate and then reparse
-      feed = make_finder.atom_feed(3, "The Sounds", "sounds.test.org", "articles.xml")
+      feed = make_finder.atom_feed(3, "Living in America", "The Sounds", "sounds.test.org", "articles.xml")
       ratom = Atom::Feed.load_feed(feed)
 
+      ratom.title.should == "Living in America"
       ratom.entries.size.should == 2
       ratom.authors.first.name.should == "The Sounds"
       ratom.links.size.should == 2
@@ -89,7 +90,7 @@ describe Spandex::Finder do
       create_file("more_stuff.md", :date => "1986/5/25")
       create_file("even_more_stuff.md", :date => "1986/5/25")
 
-      feed = make_finder.atom_feed(2, "The Sounds", "sounds.test.org", "articles.xml")
+      feed = make_finder.atom_feed(2, "Living in America", "The Sounds", "sounds.test.org", "articles.xml")
       ratom = Atom::Feed.load_feed(feed)
 
       ratom.entries.size.should == 2
@@ -99,7 +100,7 @@ describe Spandex::Finder do
       create_file("stuff.md", :date => "2011/5/25")
       create_file("more_stuff.md")
 
-      feed = make_finder.atom_feed(2, "The Sounds", "sounds.test.org", "articles.xml")
+      feed = make_finder.atom_feed(2, "Living in America", "The Sounds", "sounds.test.org", "articles.xml")
       ratom = Atom::Feed.load_feed(feed)
 
       ratom.entries.size.should == 1
