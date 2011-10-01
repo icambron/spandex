@@ -36,18 +36,32 @@ module Spandex
       @pages.values
     end
 
-    def all_articles
-      all_pages
-        .select{|page| page.date}
+    def all_articles(include_drafts = false)
+      find_articles(:include_drafts => include_drafts)
+    end
+
+    def find_articles(conditions)
+      real_conds = {:has_date => true}
+      real_conds[:draft] = false unless conditions[:include_drafts]
+      real_conds.merge!(conditions.reject{|k| k == :include_drafts})
+      find_pages(real_conds)
         .sort {|x, y| y.date <=> x.date }
     end
 
     def find_pages(conditions)
-      find_inside(all_pages, conditions)
-    end
-
-    def find_articles(conditions)
-      find_inside(all_articles, conditions)
+      output = all_pages
+      conditions.each do |k, v|
+        next if v.nil?
+        cond = case k
+               when :has_date then lambda {|p| p.date}
+               when :draft then lambda {|p| p.draft? == v}
+               when :tag then lambda {|p| p.tags.include?(v) }
+               when :title then lambda {|p| p.title.match(v)}
+               else lambda{|p| true}
+               end
+        output = output.select(&cond)
+      end
+      output
     end
 
     def tags
@@ -83,19 +97,5 @@ module Spandex
         page
       end
     end
-
-    def find_inside(xs, conditions = {}) 
-      output = xs
-      conditions.each do |k, v|
-        next unless v
-        cond = case k
-               when :tag then lambda {|p| p.tags.include?(v) }
-               when :title then lambda {|p| p.title.match(v)}
-               else lambda{|p| true}
-               end
-        output = output.select(&cond)
-      end
-      output
-    end    
   end
 end

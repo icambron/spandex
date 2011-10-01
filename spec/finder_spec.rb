@@ -27,7 +27,16 @@ describe Spandex::Finder do
 
       make_finder.all_pages.map{|p| p.title}.should =~ ["The", "Sounds"]
     end
-  
+
+    it "includes drafts" do
+      create_file("stuff.md", :draft => true)
+      make_finder.all_pages.size.should == 1
+    end
+
+    it "ignores stray files" do
+      create_file("stuff.md~", :date => "1986/5/25")
+      make_finder.all_articles.should be_empty
+    end
   end
 
   context "when getting all articles" do
@@ -45,6 +54,17 @@ describe Spandex::Finder do
       results[0].date.should == Date.civil(2011, 5, 25)
     end
 
+    it "excludes drafts by default" do
+      create_file("stuff.md", :date => "2011/5/25", :draft => true)
+      make_finder.all_articles.size == 0
+    end
+
+    it "can include drafts" do
+      create_file("stuff.md", :date => "2011/5/25", :draft => true)
+      create_file("more_stuff.md", :date => "2011/5/25", :draft => false)
+      make_finder.all_articles(true).size == 2
+    end
+
     it "sorts by date descending" do
       create_file("stuff.md", :date => "1986/5/25")
       create_file("more_stuff.md", :date => "1982/5/25") 
@@ -56,13 +76,7 @@ describe Spandex::Finder do
       [Date.civil(2011,5,25), Date.civil(1986,5,25), Date.civil(1982,5,25)].each_with_index do |date, i|
         results[i].date.should == date
       end
-    end
-
-    it "ignores stray files" do
-      create_file("stuff.md~", :date => "1986/5/25")
-      make_finder.all_articles.should be_empty
-    end
-    
+    end    
   end
 
   context "when generating an atom feed" do
@@ -182,8 +196,6 @@ describe Spandex::Finder do
       finder.get("/stuff")
       finder.all_pages.size.should == 1
     end
-    
-
   end
 
   context "when loading by filename" do
@@ -214,6 +226,18 @@ describe Spandex::Finder do
     it "can find them by titles" do
       create_file("no.md", :title => "This has the wrong title")
       create_file("yeah.md", :title => "This has the correct title")
+
+      results = make_finder.find_pages :title => "correct"
+      results.size.should == 1
+      results.first.title.should == "This has the correct title"
+    end
+
+    it "can find them by draft status" do
+      create_file "no.md"
+      create_file "yeah.md", :draft => true
+      results = make_finder.find_pages :draft => true
+      results.size.should == 1
+      results.first.draft?.should == true
     end
 
     it "can find them by multiple metrics" do
@@ -227,12 +251,26 @@ describe Spandex::Finder do
 
   context "when finding articles" do
     it "only finds articles" do
-      create_file("no.md", :tags => "yeahyeah")
-      create_file("yeah.md", :tags => "yeahyeah", :date => "2011/5/26", :title => "Yeah Yeah Yeah")      
+      create_file "no.md", :tags => "yeahyeah"
+      create_file "yeah.md", :tags => "yeahyeah", :date => "2011/5/26", :title => "Yeah Yeah Yeah"
       
-      results = make_finder.find_articles(:tag => "yeahyeah")
+      results = make_finder.find_articles :tag => "yeahyeah"
       results.size.should == 1
       results.first.title == "Yeah Yeah Yeah"
+    end
+
+    it "excludes drafts by default" do
+      create_file "no.md", :tags => "yeahyeah", :date => "2010/5/25", :draft => true
+      create_file "yeah.md", :tags => "yeahyeah", :date => "2011/5/26", :title => "Yeah Yeah Yeah"
+      results = make_finder.find_articles :tag => "yeahyeah"
+      results.size.should == 1
+    end
+
+    it "can include drats" do
+      create_file "no.md", :tags => "yeahyeah", :date => "2010/5/25", :draft => true
+      create_file "yeah.md", :tags => "yeahyeah", :date => "2011/5/26", :title => "Yeah Yeah Yeah"
+      results = make_finder.find_articles :include_drafts => true, :tag => "yeahyeah"
+      results.size.should == 2
     end
 
   end

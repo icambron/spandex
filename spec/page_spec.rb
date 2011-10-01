@@ -39,6 +39,16 @@ describe Spandex::Page do
       page.tags.should have(2).tags
     end
 
+    it "can be in draft mode" do
+      page = create_page("test.md", :draft => true)
+      page.draft?.should == true
+    end
+
+    it "isn't in draft mode by default" do
+      page = create_page("test.md")
+      page.draft?.should == false
+    end
+
     it "can parse the body" do
       page = create_page("test.md", :content => "But it's not that easy")
       page.body.should == Redcarpet::Markdown.new(Redcarpet::Render::HTML).render("But it's not that easy")
@@ -58,7 +68,7 @@ describe Spandex::Page do
       page.date.should == Date.civil(2011, 5, 25)
     end
 
-    it "can omit the date" do
+    it "can ommit the date" do
       page = create_page("test.md")
       page.date.should be_nil
     end

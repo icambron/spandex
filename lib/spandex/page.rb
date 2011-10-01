@@ -50,6 +50,10 @@ module Spandex
     def tags
       @tags ||= metadata(:tags, :categories) ? metadata(:tags, :categories).split(",").map{|tag| tag.strip} : []
     end
+
+    def draft?
+      metadata(:draft) ? true : false
+    end
     
     def to_atom_entry(root)
       unless date
