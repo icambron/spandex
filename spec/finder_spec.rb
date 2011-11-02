@@ -29,7 +29,7 @@ describe Spandex::Finder do
     end
 
     it "includes drafts" do
-      create_file("stuff.md", :draft => true)
+      create_file("stuff.md", :draft => "true")
       make_finder.all_pages.size.should == 1
     end
 
@@ -55,14 +55,14 @@ describe Spandex::Finder do
     end
 
     it "excludes drafts by default" do
-      create_file("stuff.md", :date => "2011/5/25", :draft => true)
-      make_finder.all_articles.size == 0
+      create_file("stuff.md", :date => "2011/5/25", :draft => "true")
+      make_finder.all_articles.size.should == 0
     end
 
     it "can include drafts" do
-      create_file("stuff.md", :date => "2011/5/25", :draft => true)
-      create_file("more_stuff.md", :date => "2011/5/25", :draft => false)
-      make_finder.all_articles(true).size == 2
+      create_file("stuff.md", :date => "2011/5/25", :draft => "true")
+      create_file("more_stuff.md", :date => "2011/5/25", :draft => "false")
+      make_finder.all_articles(true).size.should == 2
     end
 
     it "sorts by date descending" do
@@ -212,7 +212,7 @@ describe Spandex::Finder do
 
   end
 
-  context "when find pages" do
+  context "when finding pages" do
     it "can find them by tag" do
       create_file("no.md", :tags => "nono")
       create_file("yeah.md", :tags => "yeahyeah")
@@ -234,7 +234,7 @@ describe Spandex::Finder do
 
     it "can find them by draft status" do
       create_file "no.md"
-      create_file "yeah.md", :draft => true
+      create_file "yeah.md", :draft => "true"
       results = make_finder.find_pages :draft => true
       results.size.should == 1
       results.first.draft?.should == true
@@ -260,14 +260,14 @@ describe Spandex::Finder do
     end
 
     it "excludes drafts by default" do
-      create_file "no.md", :tags => "yeahyeah", :date => "2010/5/25", :draft => true
+      create_file "no.md", :tags => "yeahyeah", :date => "2010/5/25", :draft => "true"
       create_file "yeah.md", :tags => "yeahyeah", :date => "2011/5/26", :title => "Yeah Yeah Yeah"
       results = make_finder.find_articles :tag => "yeahyeah"
       results.size.should == 1
     end
 
     it "can include drats" do
-      create_file "no.md", :tags => "yeahyeah", :date => "2010/5/25", :draft => true
+      create_file "no.md", :tags => "yeahyeah", :date => "2010/5/25", :draft => "true"
       create_file "yeah.md", :tags => "yeahyeah", :date => "2011/5/26", :title => "Yeah Yeah Yeah"
       results = make_finder.find_articles :include_drafts => true, :tag => "yeahyeah"
       results.size.should == 2
