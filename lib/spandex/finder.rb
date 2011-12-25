@@ -41,11 +41,15 @@ module Spandex
     end
 
     def find_articles(conditions)
+      #require dates - definition of articles
       real_conds = {:has_date => true}
+      
+      #by default, don't include drafts
       real_conds[:draft] = false unless conditions[:include_drafts]
       real_conds.merge!(conditions.reject{|k| k == :include_drafts})
-      find_pages(real_conds)
-        .sort {|x, y| y.date <=> x.date }
+
+      #articles should be sorted by date descending
+      find_pages(real_conds).sort {|x, y| y.date <=> x.date }
     end
 
     def find_pages(conditions)
