@@ -55,10 +55,12 @@ describe Spandex::Page do
     end
 
     it "pass in rendering options" do
-      text = "```\nI smile but it doesn't make things right```"
+      text = "I smile but it doesn't make things right"
       create_file("test.md", :content => text)
       page = Spandex::Page.from_filename(File.join(TEMP_DIR, "test.md"), TEMP_DIR, :fenced_code_blocks => true) 
       page.render_options.should have_key(:fenced_code_blocks)
+
+      #what is going on here?
       markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, :fenced_code_blocks => true)
       page.body.should == markdown.render(text)
     end
